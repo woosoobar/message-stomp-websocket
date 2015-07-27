@@ -1,0 +1,83 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>SoundManager Page</title>
+	<script src="./soundmanager2.js"></script>
+	<script type="text/javascript">
+	
+	//var mySound = {};
+	var alaramSound = {};
+	
+	soundManager.setup({
+	  url: './alarm_critical.mp3',
+	  onready: playAudio(),
+	  ontimeout: function() {
+		// Hrmm, SM2 could not start. Missing SWF? Flash blocked? Show an error, etc.?
+	  }
+	});
+	
+	function playAudio() {
+		// alram sound
+		var mySound = soundManager.createSound({
+		  id: 'criticalSound',
+		  url: './alarm_critical.mp3',
+		  onfinish: function() {
+					console.log('alarm_critical onfinish');
+					alaramSound.play();
+				}
+		});
+	  
+		alaramSound = soundManager.createSound({
+		  id: 'alarmSound',
+		  url: './alarm.mp3',
+		  onfinish: function() {
+					console.log('alaramSound onfinish');
+				}
+		});
+		
+		mySound.play();
+	  }
+
+	/*
+	function playAudio(){
+
+		// Default playlistId to 0 if not supplied 
+		playlistId = playlistId ? playlistId : 0;
+		// If SoundManager object exists, get rid of it...
+		if (audio.nowPlaying){
+			audio.nowPlaying.destruct();
+			// ...and reset array key if end reached
+			if(playlistId == audio.playlist.length){
+				playlistId = 0;
+			}
+		}
+
+		// Standard Sound Manager play sound function...
+		soundManager.onready(function() {
+			audio.nowPlaying = soundManager.createSound({
+				id: 'sk4Audio',
+				url: '/1.mp3',
+				autoLoad: true,
+				autoPlay: true,
+				volume: 50,
+				// ...with a recursive callback when play completes
+				onfinish: function(){
+					console.log('onfinish');
+				}
+			});
+		});
+	}
+	
+	playAudio();
+	*/
+	
+	</script >
+
+</head>
+<body>
+
+<button id="connect" class="button" onclick="playAudio();">PlayAudio</button>
+
+</body>
+</html>

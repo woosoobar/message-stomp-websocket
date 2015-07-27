@@ -1,0 +1,569 @@
+<!DOCTYPE HTML>
+<html lang="us">
+<head>
+	<meta charset="utf-8">
+	<title>Websocket Page</title>
+	
+	<script src="sockjs-0.3.4.js"></script>
+    <script src="stomp.js"></script>
+    <script type="text/javascript">
+        var stompClient = null;
+        
+        function setConnected(connected) {
+            document.getElementById('connect').disabled = connected;
+            document.getElementById('disconnect').disabled = !connected;
+            document.getElementById('conversationDiv').style.visibility = connected ? 'visible' : 'hidden';
+            document.getElementById('response').innerHTML = '';
+        }
+        
+        function connect() {
+            var socket = new SockJS('/omp');
+            stompClient = Stomp.over(socket);            
+            stompClient.connect({}, function(frame) {
+                setConnected(true);
+                console.log('Connected: ' + frame);
+//                 stompClient.subscribe('/user/topic/greetings', function(greeting){
+//                     showGreeting(JSON.parse(greeting.body));
+//                 });
+                
+                stompClient.subscribe('/omp/realtimeAlarm', function(alarmMessage){
+                	showAlarm(JSON.parse(alarmMessage.body));
+                });
+                
+                stompClient.subscribe('/omp/resourceMonitor', function(resourceMonitor){
+                	showResourceMonitor(JSON.parse(resourceMonitor.body));
+                });
+            });
+        }
+        
+        function disconnect() {
+            if (stompClient != null) {
+                stompClient.disconnect();
+            }
+            setConnected(false);
+            console.log("Disconnected");
+        }
+        
+        function sendName() {
+            var name = document.getElementById('name').value;
+            stompClient.send("/app/hello", {}, JSON.stringify({ 'name': name }));
+            stompClient.send("/app/userhello", {}, JSON.stringify({ 'name': name }));
+        }
+        
+        function showAlarm(message) {
+        	
+          	var myfirstrow = 
+          		{ 	id: id, 
+          			system: message.system, 
+          			upper: message.upper, 
+          			lower: message.lower, 
+          			item: message.item,  
+          			grade: message.grade,  
+          			time: message.timestamp,  
+          			log: message.log 
+          		};
+          	
+    		$('#jqGrid').addRowData(id++, myfirstrow, 'first');
+        }
+        
+		function showResourceMonitor(message) {
+			//console.log(message.cpuMax.toString());
+			drawChart(message);
+        }
+        
+        
+        
+        function showGreeting(message) {
+            //var response = document.getElementById('response');
+            //var p = document.createElement('p');
+            //p.style.wordWrap = 'break-word';
+            //p.appendChild(document.createTextNode(message));
+            //response.appendChild(p);
+            
+       		var table = document.getElementById('responseTable');
+       		// header 를 제거하고 넣는다.
+       		var row = table.insertRow(1);
+       		
+       		//alert(table.rows.length);
+       		
+       		if(table.rows.length > 11) {
+       			table.deleteRow(table.rows.length - 1);
+       		}
+       		
+       		var cell1 = row.insertCell(0);
+       		var cell2 = row.insertCell(1);
+       		var cell3 = row.insertCell(2);
+
+       		// Add some text to the new cells:
+       		cell1.innerHTML = message.timestamp;
+       		cell2.innerHTML = message.staus;
+       		cell3.innerHTML = message.message;
+       		
+       		// graph 처리
+       		var objStatus = {};
+       		
+       		console.log(message);
+       		objStatus.title = message.timestamp;
+       		objStatus.value = 60;
+       		drawChart(objStatus);
+        }
+    </script>
+    
+
+	<!-- <script src="./morris.js-0.5.1/jquery-v1.9.0.min.js"></script>  -->
+	<script type="text/ecmascript" src="./jquery/jquery-2.1.4.js"></script>
+	
+	<!-- morris -->
+	<link rel="stylesheet" href="./morris.js-0.5.1/morris.css">
+	<!-- jquery의 혼합 사용 시 문제점 파악 필요. -->
+	
+	<script src="./morris.js-0.5.1/raphael-2.1.0-min.js"></script>
+	<script src="./morris.js-0.5.1/morris.min.js"></script>
+	
+	<!-- jqGrid  -->
+	<!-- The jQuery library is a prerequisite for all jqSuite products -->
+    <script type="text/ecmascript" src="./Guriddo_jqGrid_JS_4.8.2/js/jquery-1.11.0.min.js"></script> 
+    <!-- This is the Javascript file of jqGrid -->   
+    <script type="text/ecmascript" src="./Guriddo_jqGrid_JS_4.8.2/js/jquery.jqGrid.min.js"></script>
+    <!-- This is the localization file of the grid controlling messages, labels, etc. -->
+    <!-- We support more than 40 localizations -->
+    <script type="text/ecmascript" src="./Guriddo_jqGrid_JS_4.8.2/js/i18n/grid.locale-kr.js"></script>
+    <!-- A link to a jQuery UI ThemeRoller theme, more than 22 built-in and many more custom -->
+    <link rel="stylesheet" type="text/css" media="screen" href="./jquery-ui-1.11.4.custom/jquery-ui.css" />
+    <!-- The link to the CSS that the grid needs -->
+    <link rel="stylesheet" type="text/css" media="screen" href="./Guriddo_jqGrid_JS_4.8.2/css/ui.jqgrid.css" />
+    
+    <!-- angularJS -->
+	<script src="./angularJS/angular.min.js"></script>
+	<script src="./lodash/lodash.min.js"></script>
+	<script src="./app/app.js" type="text/javascript"></script>
+	<script src="./app/jqGridDirective.js" type="text/javascript"></script>
+    <script src="./app/controllers.js" type="text/javascript"></script>
+    <script src="./app/websockServices.js" type="text/javascript"></script>
+</head>
+
+<!--
+angularJS testing 후 변경 요망. 
+<body onload="disconnect()">
+ -->
+<body ng-app="oamApp">
+
+<div ng-controller="OamController">
+</div>
+
+
+<div ng-controller="OamJqGridController">
+	<my-jq-grid config="config" data="data"></my-jq-grid>
+</div>
+
+<!-- 
+	<table id="jqGrid"></table>
+	<button > </button>
+	 -->
+
+
+<!-- <div id="jqGridPager"></div> -->
+
+
+<script type="text/javascript"> 
+/*
+	// ID 관리 변수 : 
+	var id = 1;
+
+
+	var mydata = [
+			{ id: id++, system: "HLRCS152A", upper: "STACK", lower: "IPSP", item: "HRG_3.20", grade: "MAJOR", time: "2015-06-26 11:28:18", log: "A1363 IPSP CONNECTION STATUS ALARM OCURRED"},
+			{ id: id++, system: "HLRCS152A", upper: "HRG", lower: "IPSP", item: "HRG_3.20_AS", grade: "CRITICAL", time: "2015-06-26 11:28:18", log: "A5301 HRG STATUS ALARM OCURRED"}
+		];
+	mydata = [];
+
+  
+      $(document).ready(function () {
+          $("#jqGrid").jqGrid({
+              datatype: "local",
+		data: mydata,
+              height: 250,
+		width: 900,
+              colModel: [
+                  { label: 'ID', name: 'id', width: 75, hidden: true, key:true },
+                  { label: 'SYSTEM', name: 'system', width: 100 },
+                  { label: 'Upper', name: 'upper', width: 100  },
+                  { label: 'Lower', name: 'lower', width: 100  },
+                  { label: 'Item', name: 'item', width: 100 },
+                  { label: 'Grade', name: 'grade', width: 80, formatter: gradeFmatter },
+                  { label: 'Time', name: 'time', width: 150 },
+                  { label: 'Log', name: 'log', width: 400 }
+              ],
+              viewrecords: true, // show the current page, data rang and total records on the toolbar
+              caption: "Load jqGrid through Javascript Array",
+              loadComplete: loadComplete,
+              afterInsertRow: afterInsertRow,
+
+          });
+      });
+      
+	function deleteRow() {
+		$('#jqGrid').jqGrid('delRowData', 1);
+		console.log('call deleteRow');
+	}
+      
+      
+	function addRow() {
+      	var myfirstrow = { id: id, system: "HLRCS152A", upper: "STACK", lower: "IPSP", item: "HRG_3.20", grade: "CRITICAL", time: "2015-06-26 11:28:18", log: "A1363 IPSP CONNECTION STATUS ALARM OCURRED"};
+		$('#jqGrid').addRowData(id++, myfirstrow, 'first');
+	}
+      
+	function updateCell(){
+		$('#jqGrid').setCell( 1, 'grade', '', { background: 'red', color: 'white'});
+	}
+      
+	function gradeFmatter (cellvalue, options, rowObject)
+	{
+		//console.log('gradeFmatter');
+		// style 설정은 하지 못함. id의 값이 할당이 이후에 벌어지는 것으로 보여짐.
+		return cellvalue;
+	}
+      
+	function afterInsertRow (rowid, aData) {
+      	$("#jqGrid").jqGrid('setCell', rowid, 'grade', '', getGradeCellStyle(aData.grade) );
+	}
+       
+	function loadComplete () {
+		console.log('loadComplete');
+		var myGrid = jQuery("#jqGrid");
+		var ids = myGrid.jqGrid('getDataIDs');
+		console.log(ids);
+		for (var i = 0; i < ids.length; i++) {
+		    var id=ids[i];
+		    
+		    // var customToolTip = myGrid.jqGrid('getCell',ids,'ds_name') + " -- " + myGrid.jqGrid('getCell',ids,'hidden4');
+		    var grade = myGrid.jqGrid('getCell', id, 'grade');
+		    myGrid.jqGrid('setCell', id, 'grade', '', getGradeCellStyle(grade));
+		}
+	}
+	
+	function colorToHex(color) {
+	    if (color.substr(0, 1) === '#') {
+	        return color;
+	    }
+	    var digits = /(.*?)rgb\((\d+), (\d+), (\d+)\)/.exec(color);
+
+	    var red = parseInt(digits[2]);
+	    var green = parseInt(digits[3]);
+	    var blue = parseInt(digits[4]);
+
+	    var rgb = blue | (green << 8) | (red << 16);
+	    return digits[1] + '#' + rgb.toString(16);
+	};
+	
+
+	function getGradeCellStyle(grade){
+		var color = '';
+		if(grade == 'CRITICAL'){
+			color = 'red';
+		} else if(grade == 'MAJOR'){
+			color = '#ffa500';
+		} else if (grade == 'MINOR'){
+			color = '#e8e217';
+		} else if (grade == 'NORMAL'){
+			color = '#90ee90';
+		}
+		
+		var style = { background: color, color: 'white', 'font-weight': 'bold' };
+		return style;
+	}
+
+*/
+</script>
+    
+    <div padding="5">
+    	<button id="addRow" class="button"  onclick="addRow();" >Add</button>
+    	<button id="deleteRow" class="button" onclick="deleteRow();" >Delete</button>
+    	<button id="updateCell" class="button" onclick="updateCell();" >UpdateCell</button>
+    </div>
+
+<!-- 차트 -->
+<div>
+	<div id="myfirstchart" style="height: 300px;"></div>
+</div>
+
+
+<script>
+
+var xSize = 6 * 5; // 1초당 (10초당)
+
+
+
+var data = new Array();
+
+
+function getDateString(date){
+	return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() 
+			+ ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+}
+
+
+function drawChart(message){
+	
+	//console.log(objStatus.cpuMax.toString());
+	
+	$( "#myfirstchart" ).empty();
+
+	if(data.length == 0) {
+		// 서버에서 사이즈를 받아서 처리를 하도록 한다.
+		var d = new Date();
+		
+		//console.log((d.getDate() + 1).toString());
+		//console.log(getDateString(d));
+		//d = new Date(Date.parse(d) - (1000 * 10 * xSize)); // 5분전
+		d = new Date(Date.parse(d) - (1000 * 1 * xSize)); // 5분전
+		//console.log(getDateString(d));
+
+		for(var i = 0 ; i < xSize; i++) {
+			var item = {y:getDateString(d), cpu:10};
+			data.push(item);
+			
+			//d = new Date(Date.parse(d) + (1000 * 10)); // 10 초 후
+			d = new Date(Date.parse(d) + (1000 * 1)); // 1 초 후
+		}
+
+	} else {
+		// 우선은 모두 재 생성하는 코드로 처리를 하도록 한다.
+		var tempData = new Array();
+		
+		for(var i = 0 ; i < data.length - 1; i++) {
+			tempData.push(data[i + 1]);
+		}
+		
+		var item = {y:message.timestamp, cpu:message.cpuMax};
+		tempData.push(item);
+		
+		data = tempData;
+	}
+	
+	//console.log('calling');
+	//console.log(data);
+	
+	console.log(data);
+
+	Morris.Line({
+		  element: 'myfirstchart',
+		  data: data,
+		  xkey: 'y',
+		  ykeys: ['cpu'],
+		  ymax: 100,
+		  ymin: 0,
+		  pointSize : 0,
+		  labels: ['CPU']
+		});
+}
+
+drawChart(null);
+
+</script>
+<!-- 
+<div id="Nwagon"></div>
+<script>
+//alert('call');
+
+var xSize = 10;
+
+var xTitle = new Array();
+var xValue = new Array();
+
+function drawChart(objStatus){
+	
+	console.log(xTitle.length);
+	
+	if(xTitle.length == 0) {
+		for(var i = 0 ; i < xSize; i++) {
+			xTitle.push("0" + i.toString());
+			
+			var item = [];
+			item[0] = 50;
+			
+			xValue.push(item);
+		}	
+	} else {
+		// 우선은 모두 재 생성하는 코드로 처리를 하도록 한다.
+		var tempTitle = new Array();
+		var tempValue = new Array();
+		
+		for(var i = 0 ; i < xSize - 1; i++) {
+			xTitle.push(xTitle[i + 1]);
+			
+			var item = [];
+			item[0] = xValue[i + 1];
+			
+			xValue.push(item);
+		}
+		
+		xTitle.push(objStatus.title);
+		
+		var item = [];
+		item[0] = objStatus.value;
+		xValue.push(item);
+		
+		
+		xTitle = tempTitle;
+		xValue = tempValue;
+	}
+
+	
+	console.log(xValue);
+
+	var options = {
+		'legend':{
+			names: xTitle,
+			hrefs: []
+		},
+		'dataset':{
+			title:'Playing time per day',
+			values: xValue,
+			colorset: ['#DC143C'],
+			fields:['CPU']
+		},
+		'chartDiv' : 'Nwagon',
+		'chartType' : 'line',
+		'chartSize' : {width:700, height:300},
+		'minValue' : 0,
+		'maxValue' : 100,
+		'increment' : 20,
+		'isGuideLineNeeded' : false  //default set to false
+	};
+	console.log(options.legend.names);
+	//options.legend.names = xTitle;
+	//console.log(options.legend.names);
+	Nwagon.chart(options);
+	
+	Nwagon.chart(options);
+}
+	
+drawChart(null);
+
+</script>
+ -->
+
+<!-- 
+<textarea id="codemirror"></textarea>
+
+<script>
+    $(function() {
+        $("#codemirror").val($("#script_code").html());
+
+        CodeMirror.fromTextArea(document.getElementById("codemirror"), {
+            lineNumbers: true,
+            mode: "javascript"
+        });
+    })
+
+</script>
+ -->
+
+<!--
+<div id="chart"></div> 
+<script id="script_code">
+    jui.ready([ "chartx.realtime", "util.base", "util.time" ], function(chart, _, time) {
+        var index = 0;
+
+        window.getData = function(min) {
+            var start = time.add(new Date(), time.minutes, -5);
+
+            var data = [];
+            // 10초당 한번의 오청으로 처리를 하도록 구성함.
+            for(var i = 0; i < min * 60; i++) {
+                data.push({ name : 0, name2 : 100, name3 : 30, value : time.add(start, time.seconds, i + 1) });
+                index++;
+            }
+
+            return data;
+        }
+
+        window.runData = function() {
+            setInterval(function() {
+                c.append({
+                    name : 0,
+                    name2 : 100,
+                    name3 : 20,
+                    value : new Date()
+                });
+
+                index++;
+            }, 10000);
+        }
+
+        c = chart("#chart", {
+            width: 800,
+            height : 200,
+            theme : "jennifer",
+            //data : getData(5),
+            series : {
+                name : {
+                    text : "하한선"
+                },
+                name2 : {
+                    text : "상한성"
+                },
+                name3 : {
+                    text : "실데이터"
+                },
+                value : {
+                    text : "날짜"
+                }
+            },
+            axis : {
+                key : "value",
+                xstep: 1, 
+                ystep: 5,
+                xhide: false, yhide: false,
+                data : getData(5)
+            },
+            brush : [{
+                type : "line",
+                target : [ "name", "name2", "name3" ]
+            }],
+            widget : [
+                {
+                    type : "title", text : 'Range Bubble Sample'
+                }, {
+                    type : "legend"
+                }, {
+                    type : "cross",
+                    xFormat : function(d) {
+                        return _.dateFormat(d, "hh:mm:ss");
+                    },
+                    yFormat : function(d) {
+                        return Math.round(d);
+
+                    }
+                }, {
+                    type : "tooltip"
+                }
+            ]
+        });
+
+        runData();
+    });
+
+</script>
+ -->
+
+<noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being enabled. Please enable
+    Javascript and reload this page!</h2></noscript>
+    
+
+<div>
+    <div>
+        <button id="connect" class="button" onclick="connect();">Connect</button>
+        <button id="disconnect" class="button" disabled="disabled" onclick="disconnect();">Disconnect</button>
+    </div>
+    <div id="conversationDiv">
+        <label>What is your name?</label><input type="text" id="name" />
+        <button id="sendName" class="button" onclick="sendName();">Send</button>
+        <p id="response"></p>
+    </div>
+    
+
+
+</body>
+</html>

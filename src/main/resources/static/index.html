@@ -1,0 +1,219 @@
+<!DOCTYPE HTML>
+<html lang="us">
+<head>
+	<meta charset="utf-8">
+	<title>Websocket Page</title>
+	
+	<script src="sockjs-0.3.4.js"></script>
+    <script src="stomp.js"></script>
+    
+    <!-- jquery 설정 -->
+    <script type="text/ecmascript" src="./jquery/jquery-2.1.4.js"></script>
+    <!-- The jQuery library is a prerequisite for all jqSuite products -->
+    <!-- 
+    <script type="text/ecmascript" src="./Guriddo_jqGrid_JS_4.8.2/js/jquery-1.11.0.min.js"></script>
+     --> 
+	
+	<!-- morris -->
+	<!-- 
+	<link rel="stylesheet" href="./morris.js-0.5.1/morris.css">
+	<script src="./morris.js-0.5.1/raphael-2.1.0-min.js"></script>
+	<script src="./morris.js-0.5.1/morris.min.js"></script>
+	 -->
+	
+	<!-- jqGrid  -->   
+    <script type="text/ecmascript" src="./Guriddo_jqGrid_JS_4.8.2/js/jquery.jqGrid.min.js"></script>
+    <script type="text/ecmascript" src="./Guriddo_jqGrid_JS_4.8.2/js/i18n/grid.locale-kr.js"></script>
+    
+    <!-- A link to a jQuery UI ThemeRoller theme, more than 22 built-in and many more custom -->
+    <!-- The link to the CSS that the grid needs -->
+    <link rel="stylesheet" type="text/css" media="screen" href="./jquery-ui-1.11.4.custom/jquery-ui.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="./Guriddo_jqGrid_JS_4.8.2/css/ui.jqgrid.css" />
+    
+    
+    <!-- chartistjs -->
+    <link rel="stylesheet" href="./chartist-js/chartist.min.css">
+    <script src="./chartist-js/chartist.min.js"></script>
+    
+    <!-- angularJS -->
+    <script src="./angularJS/angular.min.js"></script>
+    <script src="./lodash/lodash.min.js"></script>
+    <script src="./app/app.js" type="text/javascript"></script>
+    <script src="./app/jqGridDirective.js" type="text/javascript"></script>
+    <script src="./app/chartDirective.js" type="text/javascript"></script>
+    <script src="./app/chatControllers.js" type="text/javascript"></script>
+    <script src="./app/websockServices.js" type="text/javascript"></script>
+    
+    <!-- angularJS treeview -->
+    <!-- 
+    <link rel="stylesheet" type="text/css" media="screen" href="./angular.treeview/css/angular.treeview.css" />
+    <script src="./angular.treeview/angular.treeview.js"></script>
+     -->
+    
+    <!-- jsTree -->
+    
+ 
+    <link rel="stylesheet" href="./demo/assets/bootstrap/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./demo/assets/dist/themes/proton/style.css" />
+    <link rel="stylesheet" href="./demo/assets/docs.css" />
+    
+    <link rel="icon" href="./demo/assets/favicon.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon-precomposed" href="./demo/assets/apple-touch-icon-precomposed.png" />
+    
+    <!-- <link rel="stylesheet" href="./jsTree/themes/default/style.min.css" />  -->
+ 
+    <script src="./jsTree/jstree.min.js"></script>
+    
+</head>
+
+
+<body ng-app="oamApp">
+
+<div ng-controller="chatController" >
+  <form ng-submit="addMessage()" name="messageForm">
+    <input type="text" placeholder="Compose a new message..." ng-model="message" />
+    <div class="info">
+      <span class="count" ng-bind="max - message.length" ng-class="{danger: message.length > max}">140</span>
+      <button ng-disabled="message.length > max || message.length === 0">Send</button>
+    </div>
+  </form>
+  <hr />
+   
+  <p ng-repeat="message in messages | orderBy:'time':true" class="message">
+    <time>{{message.time | date:'HH:mm'}}</time>
+    <span ng-class="{self: message.self}">{{message.message}}</span>
+  </p>
+
+</div>
+
+<!-- 
+	<div class="row">
+       <div class="col-md-4">
+           <div id="jstree-proton-1" style="margin-top:20px;" class="proton-demo">
+               <ul>
+                   <li>sIMS1
+                       <ul>
+                           <li data-jstree='{ "selected" : true,  "opened" : true  }'>
+                               <a href="#">
+                                   <em>Data</em>
+                                   <strong>Storage</strong>
+                               </a>
+                               <ul>
+                                   <li>DS1A</li>
+                                   <li>DS1B</li>
+                               </ul>
+                           </li>
+                           <li data-jstree='{ "icon" : "./demo/assets/images/vm_green.png" }'>Interface</li>
+                           <li data-jstree='{ "opened" : true }'>MediaControl
+                               <ul>
+                                   <li>Another node</li>
+                               </ul>
+                           </li>
+                           <li data-jstree='{ "icon" : "glyphicon glyphicon-leaf" }'>Custom icon class (bootstrap)</li>
+                       </ul>
+                   </li>
+                   <li><a href="http://www.jstree.com">Root node 2</a>
+                   </li>
+               </ul>
+           </div>
+       </div>
+
+ <script>
+    $(function() {
+        $('#jstree-proton-1').jstree({
+            'core': {
+                'themes': {
+                    'name': 'proton',
+                    'responsive': true
+                }
+            }
+        });
+
+        /*
+        $('#jstree-proton-2').jstree({
+            'plugins': ["wholerow"],
+            'core': {
+                'themes': {
+                    'name': 'proton',
+                    'responsive': true
+                }
+            }
+        });
+        $('#jstree-proton-3').jstree({
+            'plugins': ["wholerow", "checkbox"],
+            'core': {
+                'data': [{
+                        "text": "Wholerow with checkboxes",
+                        "children": [{
+                            "text": "initially selected",
+                            "state": {
+                                "selected": true
+                            }
+                        }, {
+                            "text": "custom icon URL",
+                            "icon": "./assets/images/tree_icon.png"
+                        }, {
+                            "text": "initially open",
+                            "state": {
+                                "opened": true
+                            },
+                            "children": ["Another node"]
+                        }, {
+                            "text": "custom icon class",
+                            "icon": "glyphicon glyphicon-leaf"
+                        }]
+                    },
+                    "And wholerow selection"
+                ],
+                'themes': {
+                    'name': 'proton',
+                    'responsive': true
+                }
+            }
+        });
+		*/
+    });
+    </script>
+  -->
+<!-- 왼쪽의 리본 모양
+    <a class="hidden-xs hidden-sm" href="https://github.com/orangehill/jstree-bootstrap-theme">
+        <img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_green_007200.png" alt="Fork me on GitHub">
+    </a>
+     -->
+
+<!-- 
+<div ng-controller="realtimeStaticGridController">
+	<realtime-static-grid config="config" data="data"></realtime-static-grid>
+</div>
+
+ 
+ 
+<div>
+<p></p>
+<hr style="color: #00f;background-color: #f00;height: 6px;">
+<p></p>
+</div>
+
+
+
+ 
+<div ng-controller="AlaramGridController">
+	<alaram-grid config="config" data="data"></my-jq-grid>
+</div>
+
+ 
+<div>
+<p></p>
+<hr style="color: #00f;background-color: #00f;height: 6px;">
+<p></p>
+</div>
+ -->
+
+<!--  
+<div ng-controller="ResourceChartController3">
+	<div class="ct-chart ct-golden-section" id="chart1"  data-ng-init="init()"></div>
+</div>
+
+ -->
+</body>
+</html>
