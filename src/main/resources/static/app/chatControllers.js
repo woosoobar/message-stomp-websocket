@@ -13,7 +13,7 @@
 		subscriber = websokService.subscribe("/user/queue/greetings");
 		subscriber.listener.promise.then(null, null, function(message) {
 			console.log(message);
-			//$scope.messages.push(message);
+			$scope.messages.push(message);
 	
 	    });
 		
@@ -22,9 +22,11 @@
 		$scope.max = 140;
 		
 		$scope.addMessage = function() {
+
 			websokService.send($scope.message);
 			$scope.message = "";
 		};
+		
 		
 
 		

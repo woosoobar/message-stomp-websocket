@@ -2,24 +2,13 @@
 <html lang="us">
 <head>
 	<meta charset="utf-8">
-	<title>Websocket Page</title>
+	<title>[Demo] OAM Service</title>
 	
 	<script src="sockjs-0.3.4.js"></script>
     <script src="stomp.js"></script>
     
     <!-- jquery 설정 -->
     <script type="text/ecmascript" src="./jquery/jquery-2.1.4.js"></script>
-    <!-- The jQuery library is a prerequisite for all jqSuite products -->
-    <!-- 
-    <script type="text/ecmascript" src="./Guriddo_jqGrid_JS_4.8.2/js/jquery-1.11.0.min.js"></script>
-     --> 
-	
-	<!-- morris -->
-	<!-- 
-	<link rel="stylesheet" href="./morris.js-0.5.1/morris.css">
-	<script src="./morris.js-0.5.1/raphael-2.1.0-min.js"></script>
-	<script src="./morris.js-0.5.1/morris.min.js"></script>
-	 -->
 	
 	<!-- jqGrid  -->   
     <script type="text/ecmascript" src="./Guriddo_jqGrid_JS_4.8.2/js/jquery.jqGrid.min.js"></script>
@@ -48,21 +37,18 @@
     <!-- 
     <link rel="stylesheet" type="text/css" media="screen" href="./angular.treeview/css/angular.treeview.css" />
     <script src="./angular.treeview/angular.treeview.js"></script>
-     -->
+     -->    
     
-    <!-- jsTree -->
-    
- 
+    <!--
     <link rel="stylesheet" href="./demo/assets/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="./demo/assets/dist/themes/proton/style.css" />
     <link rel="stylesheet" href="./demo/assets/docs.css" />
-    
+     
     <link rel="icon" href="./demo/assets/favicon.ico" type="image/x-icon" />
     <link rel="apple-touch-icon-precomposed" href="./demo/assets/apple-touch-icon-precomposed.png" />
-    
-    <!-- <link rel="stylesheet" href="./jsTree/themes/default/style.min.css" />  -->
- 
+    <link rel="stylesheet" href="./jsTree/themes/default/style.min.css" />  
     <script src="./jsTree/jstree.min.js"></script>
+    -->
     
 </head>
 
@@ -77,16 +63,62 @@
       <button ng-disabled="message.length > max || message.length === 0">Send</button>
     </div>
   </form>
-  <hr />
-   
+  
+  
+  
+  <hr/>
+  
   <p ng-repeat="message in messages | orderBy:'time':true" class="message">
     <time>{{message.time | date:'HH:mm'}}</time>
     <span ng-class="{self: message.self}">{{message.message}}</span>
   </p>
+  
+  <hr/>
 
+ 
 </div>
 
-<!-- 
+
+ 
+<div ng-controller="realtimeStaticGridController">
+	<realtime-static-grid config="config" data="data"></realtime-static-grid>
+</div>
+
+ 
+ 
+<div>
+<p></p>
+<hr style="color: #00f;background-color: #f00;height: 6px;">
+<p></p>
+</div>
+
+
+
+ 
+<div ng-controller="AlaramGridController">
+	<alaram-grid config="config" data="data"></my-jq-grid>
+</div>
+
+ 
+<div>
+<p></p>
+<hr style="color: #00f;background-color: #00f;height: 6px;">
+<p></p>
+</div>
+
+
+  
+<div ng-controller="ResourceChartController3">
+	<div class="ct-chart ct-golden-section" id="chart1"  data-ng-init="init()"></div>
+</div>
+
+
+</body>
+</html>
+
+
+
+<!-- Tree의 처리
 	<div class="row">
        <div class="col-md-4">
            <div id="jstree-proton-1" style="margin-top:20px;" class="proton-demo">
@@ -180,40 +212,3 @@
         <img style="position: absolute; top: 0; left: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_left_green_007200.png" alt="Fork me on GitHub">
     </a>
      -->
-
-<!-- 
-<div ng-controller="realtimeStaticGridController">
-	<realtime-static-grid config="config" data="data"></realtime-static-grid>
-</div>
-
- 
- 
-<div>
-<p></p>
-<hr style="color: #00f;background-color: #f00;height: 6px;">
-<p></p>
-</div>
-
-
-
- 
-<div ng-controller="AlaramGridController">
-	<alaram-grid config="config" data="data"></my-jq-grid>
-</div>
-
- 
-<div>
-<p></p>
-<hr style="color: #00f;background-color: #00f;height: 6px;">
-<p></p>
-</div>
- -->
-
-<!--  
-<div ng-controller="ResourceChartController3">
-	<div class="ct-chart ct-golden-section" id="chart1"  data-ng-init="init()"></div>
-</div>
-
- -->
-</body>
-</html>

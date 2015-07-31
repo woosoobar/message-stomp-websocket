@@ -26,20 +26,26 @@ public class OmpController {
 	
 	@MessageMapping("/omp")
 	@SendTo("/topic/greetings")
-	//@SendToUser("/topic/greetings")
-	public Greeting greeting(HelloMessage message) throws Exception {
-		Thread.sleep(3000);
-		return new Greeting("Hello, total : " + message.getName() + "!");
+	public Message greeting(Message message) throws Exception {
+		//Thread.sleep(3000);
+		Message outMsg = new Message();
+		outMsg.setMessage(message.getMessage());
+		outMsg.setId(message.getId());
+		outMsg.setTime(new Date());
+		return outMsg;
 	}
 	
 	@MessageMapping("/userhello")
-	//@SendToUser("/user/{username}")
 	@SendToUser("/queue/greetings")
-	public Greeting userGreeting(HelloMessage message) throws Exception {
-		//Thread.sleep(3000);
-		
+	public Message userGreeting(Message message) throws Exception {
+
 		logger.info(message);
-		return new Greeting("Hello, user : " + message.getName() + "!");
+		
+		Message outMsg = new Message();
+		outMsg.setMessage(message.getMessage());
+		outMsg.setId(message.getId());
+		outMsg.setTime(new Date());
+		return outMsg;
 	}
 	
 	@Scheduled(fixedRate = 1000)
@@ -67,7 +73,8 @@ public class OmpController {
 
 		ResourceMonitor resourceMonitor = new ResourceMonitor();
 
-		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		//DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 		Date date = new Date();
 		
 		resourceMonitor.setTimestamp(dateFormat.format(date));

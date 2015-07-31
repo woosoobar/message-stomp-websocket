@@ -208,7 +208,7 @@
 			chartData.splice(0, 1);
 			
 			chartLabel.push(message.timestamp);
-			chartData.push(message.cpuMax);
+			chartData.push(message.cpuAverage);
 			
 			chartUpdate(chartLabel, chartData);
 			
@@ -224,7 +224,7 @@
 		
 		function setData(id, data){
 			
-			console.log('******************************************************');
+			//console.log('******************************************************');
 			console.log(data);
 			
 			return;
