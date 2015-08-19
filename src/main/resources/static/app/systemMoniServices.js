@@ -66,12 +66,6 @@ angular.module("systemMoni.services").service("SystemMoniService", function($q, 
 		out.data = message;
 		return out;
 	};
-	var getAlarm2 = function(data) {
-		var message = JSON.parse(data), out = {};
-		out.gubun = "2";
-		out.data = message;
-		return out;
-	};
 	var getGraph1 = function(data) {
 		var message = JSON.parse(data), out = {};
 		out.gubun = "3";
@@ -89,11 +83,8 @@ angular.module("systemMoni.services").service("SystemMoniService", function($q, 
 		socket.stomp.subscribe(service.MASKED, function(data) {
 			listener.notify(getAll(data.body));
 		});
-		socket.stomp.subscribe("/topic/smRealtimeAlarm", function(data) {
+		socket.stomp.subscribe("/topic/smRealtimeAlarmTwo", function(data) {
 			listener.notify(getAlarm1(data.body));
-		});
-		socket.stomp.subscribe("/topic/smRealtimeAlarmVe", function(data) {
-			listener.notify(getAlarm2(data.body));
 		});
 		socket.stomp.subscribe("/topic/smResourceGraph", function(data) {
 			listener.notify(getGraph1(data.body));

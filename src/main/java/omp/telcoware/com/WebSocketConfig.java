@@ -20,20 +20,14 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry config) {
-		// TODO Auto-generated method stub
-		//super.configureMessageBroker(registry);
-		//config.enableSimpleBroker("/topic,/user");
+		
 		config.enableSimpleBroker("/queue", "/topic");
-		//config.enableSimpleBroker("/omp");
-
-		//config.enableSimpleBroker("/test");
-		//config.enableSimpleBroker("/user");
 		config.setApplicationDestinationPrefixes("/app");
 	}
 	
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/omp").withSockJS();
+		registry.addEndpoint("/omp", "/chat", "/sysmoni").withSockJS();
 	}
 	
 }

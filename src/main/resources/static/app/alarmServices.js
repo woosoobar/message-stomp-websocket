@@ -50,28 +50,13 @@ angular.module("alarm.services").service("AlarmService", function($q, $timeout) 
 	var getAll = function(data) {
 		var out = {},
 			message = JSON.parse(data);
-//		out.uppers = message.uppers;
-//		out.lowers = message.lowers;
-//		out.items = message.items;
-		
-//		out.time = new Date(message.time);
-//		if (_.contains(messageIds, message.id)) {
-//			out.self = true;
-//			messageIds = _.remove(messageIds, message.id);
-//		}
 		return message;
 	};
 
 	var startListener = function() {
-//		socket.stomp.subscribe(service.ALL_SYSTEM_MONI, function(data) {
-//			listener.notify(getAll(data.body));
-//		});
 		socket.stomp.subscribe(service.CHANGE_SYSTEM_MONI, function(data) {
 			listener.notify(getAll(data.body));
 		});
-//		socket.stomp.subscribe(service.MASKED, function(data) {
-//			listener.notify(getAll(data.body));
-//		});
 	};
 
 	var initialize = function() {

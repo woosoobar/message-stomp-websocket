@@ -32,12 +32,6 @@ angular.module("systemMoni.controllers").controller("SystemMoniCtrl", function($
 			}
 			$scope.alarmList.push(data.data);
 			$scope.alarmList2[0].push(data.data);
-		} else if (data.gubun == "2") {
-
-			if ($scope.data.length == 10) {
-				$scope.data.shift();
-			}
-			$scope.data.push(data.data);
 
 		} else if (data.gubun == "3") {
 
